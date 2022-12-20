@@ -1,21 +1,21 @@
-#Juggluco Tasker Plugin
+# Juggluco Tasker Plugin
 
 This Android App provides an interface between Juggluco and Tasker.
 It converts the Glucodata broadcast from Juggluco to an event for Tasker.
 This event can be used for Tasker profiles.
 
-##Installation
+## Installation
 Install the last released version and start it once. 
-You will be asked to disable battery optimisation.
+You will be asked to disable battery optimization. Please turn it off.
 
-##Configuration
+## Configuration
 In Juggluco activate "Glucodata broadcast" in the settings menu.
 
 
 If all works like expected you can create a new profile in Tasker and select as event the plugin Juggluco Tasker Plugin.
 Now you can use the variables for anything you like to do with.
 
-###Tasker Variables
+### Tasker Variables
 
 The event contains these variables:
 
