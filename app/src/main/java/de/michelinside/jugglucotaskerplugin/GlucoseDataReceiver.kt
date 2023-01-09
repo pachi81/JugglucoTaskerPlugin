@@ -62,49 +62,54 @@ object ReceiveData {
 
 class GlucoseDataReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
-        val action = intent.action
-        if (action != ACTION) {
-            Log.e(LOG_ID, "action=" + action + " != " + ACTION)
-            return
-        }
-        val extras = intent.extras
-        Log.i(LOG_ID, "Glucodata received from sensor: " +  extras!!.getString(SERIAL) + " - value: " + extras.getFloat(GLUCOSECUSTOM).toString() + " - timestamp: " + dateformat.format(Date(
-            extras.getLong(TIME)
-        )))
-
-        val timeDiff = extras.getLong(TIME) - ReceiveData.time
-        if(timeDiff > 50000) // check for new value received
-        {
-            ReceiveData.sensorID = extras!!.getString(SERIAL) //Name of sensor
-            ReceiveData.glucose = extras.getFloat(GLUCOSECUSTOM).toBigDecimal().setScale(1, RoundingMode.HALF_UP).toFloat() //Glucose value in unit in setting
-            ReceiveData.rate = extras.getFloat(RATE) //Rate of change of glucose. See libre and dexcom label functions
-            ReceiveData.rateLabel = getRateLabel(context)
-            ReceiveData.alarm = extras.getInt(ALARM) //See showalarm.
-            if (ReceiveData.time > 0) {
-                ReceiveData.timeDiff = timeDiff
-                val timeDiffMinute = (ReceiveData.timeDiff.toFloat()/60000).toBigDecimal().setScale(0, RoundingMode.HALF_UP).toInt()
-                if(timeDiffMinute > 0) {
-                    ReceiveData.delta =
-                        ((extras.getInt(MGDL) - ReceiveData.rawValue) / timeDiffMinute).toFloat()
-                } else {
-                    Log.w(LOG_ID, "Timediff is less than a minute: " + ReceiveData.timeDiff + "ms")
-                }
-                val newRaw = extras.getInt(MGDL)
-                if(newRaw!=ReceiveData.glucose.toInt())  // mmol/l
-                {
-                    val scale = if (abs(ReceiveData.delta) > 1.0F) 1 else 2
-                    ReceiveData.delta = (ReceiveData.delta / 18.0182F).toBigDecimal().setScale( scale, RoundingMode.HALF_UP).toFloat()
-                }
+        try {
+            val action = intent.action
+            if (action != ACTION) {
+                Log.e(LOG_ID, "action=" + action + " != " + ACTION)
+                return
             }
-            ReceiveData.rawValue = extras.getInt(MGDL)
-            ReceiveData.time = extras.getLong(TIME) //time in mmsec
+            val extras = intent.extras
+            Log.i(LOG_ID, "Glucodata received from sensor: " +  extras!!.getString(SERIAL) + " - value: " + extras.getFloat(GLUCOSECUSTOM).toString() + " - timestamp: " + dateformat.format(Date(
+                extras.getLong(TIME)
+            )))
 
-            GlucodataEvent::class.java.requestQuery(context, GlucodataValues() )
+            val timeDiff = extras.getLong(TIME) - ReceiveData.time
+            if(timeDiff > 50000) // check for new value received
+            {
+                ReceiveData.sensorID = extras!!.getString(SERIAL) //Name of sensor
+                ReceiveData.glucose = extras.getFloat(GLUCOSECUSTOM).toBigDecimal().setScale(1, RoundingMode.HALF_UP).toFloat() //Glucose value in unit in setting
+                ReceiveData.rate = extras.getFloat(RATE) //Rate of change of glucose. See libre and dexcom label functions
+                ReceiveData.rateLabel = getRateLabel(context)
+                ReceiveData.alarm = extras.getInt(ALARM) //See showalarm.
+                if (ReceiveData.time > 0) {
+                    ReceiveData.timeDiff = timeDiff
+                    val timeDiffMinute = (ReceiveData.timeDiff.toFloat()/60000).toBigDecimal().setScale(0, RoundingMode.HALF_UP).toInt()
+                    if(timeDiffMinute > 0) {
+                        ReceiveData.delta =
+                            ((extras.getInt(MGDL) - ReceiveData.rawValue) / timeDiffMinute).toFloat()
+                    } else {
+                        Log.w(LOG_ID, "Timediff is less than a minute: " + ReceiveData.timeDiff + "ms")
+                    }
+                    val newRaw = extras.getInt(MGDL)
+                    if(newRaw!=ReceiveData.glucose.toInt())  // mmol/l
+                    {
+                        val scale = if (abs(ReceiveData.delta) > 1.0F) 1 else 2
+                        ReceiveData.delta = (ReceiveData.delta / 18.0182F).toBigDecimal().setScale( scale, RoundingMode.HALF_UP).toFloat()
+                    }
+                }
+                ReceiveData.rawValue = extras.getInt(MGDL)
+                ReceiveData.time = extras.getLong(TIME) //time in mmsec
+
+                GlucodataEvent::class.java.requestQuery(context, GlucodataValues() )
+                notifier?.newIntent()
+            }
+        } catch (exc: Exception) {
+            Log.e(LOG_ID, "Exception: " + exc.message.toString() )
         }
     }
 
     companion object {
-        private const val LOG_ID = "JugglucoTaskerPlugin Receiver"
+        private const val LOG_ID = "JugglucoTaskerPlugin.Receiver"
         private const val ACTION = "glucodata.Minute"
         private const val SERIAL = "glucodata.Minute.SerialNumber"
         private const val MGDL = "glucodata.Minute.mgdl"
@@ -113,6 +118,7 @@ class GlucoseDataReceiver : BroadcastReceiver() {
         private const val ALARM = "glucodata.Minute.Alarm"
         private const val TIME = "glucodata.Minute.Time"
         var dateformat = DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.DEFAULT)
+        var notifier: NewIntentReceiver? = null
     }
 
 

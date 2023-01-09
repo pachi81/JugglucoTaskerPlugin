@@ -43,7 +43,5 @@
     <string name="info_label_per_minute">per minute</string>
 
     <string name="activity_main_info_label">INFO: To receiving data from Juggluco, please open Juggluco, go to settings and activate \"Glucodata Broadcast\". Then you can add this plugin as a tasker event profile.</string>
-    <string name="activity_main_last_value_label">For showing the last received value, please press the Update button!</string>
-    <string name="activity_main_update_button_label">Update</string>
     <string name="no_data">No broadcast received yet!</string>
 </resources>
