@@ -11,10 +11,13 @@ import android.util.Log
 import android.widget.Button
 import android.widget.TextView
 
-class MainActivity : AppCompatActivity() {
+public interface NewIntentReceiver {
+    public fun newIntent()
+}
+
+class MainActivity : AppCompatActivity(), NewIntentReceiver {
     private lateinit var txtLastValue: TextView
     private lateinit var txtVersion: TextView
-    private lateinit var btnButton: Button
     private val LOG_ID = "JugglucoTaskerPlugin.Main"
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,14 +36,11 @@ class MainActivity : AppCompatActivity() {
 
         txtVersion = findViewById(R.id.txtVersion)
         txtVersion.text = BuildConfig.VERSION_NAME
-        btnButton = findViewById(R.id.btnUpdate)
-        btnButton.setOnClickListener {
-            update()
-        }
     }
 
     override fun onPause() {
         super.onPause()
+        GlucoseDataReceiver.notifier = null
         Log.d(LOG_ID, "onPause called")
     }
 
@@ -48,10 +48,16 @@ class MainActivity : AppCompatActivity() {
         super.onResume()
         Log.d(LOG_ID, "onResume called")
         update()
+        GlucoseDataReceiver.notifier = this
     }
 
     private fun update() {
         txtLastValue = findViewById(R.id.txtLastValue)
         txtLastValue.text = ReceiveData.getAsString(this)
+    }
+
+    override fun newIntent() {
+        Log.d(LOG_ID, "new intent received")
+        update()
     }
 }

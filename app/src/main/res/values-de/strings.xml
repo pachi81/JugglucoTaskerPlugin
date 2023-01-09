@@ -2,8 +2,6 @@
 <resources>
     <string name="app_name">Juggluco Tasker Plugin</string>
     <string name="activity_main_info_label">INFO: Damit das Plugin für Tasker funktioniert, muss in Juggluco unter Settings \"Glucodata Broadcast\" aktiviert werden. Danach kann in Tasker dieses Plugin als Ereignis Profil hinzugefügt werden.</string>
-    <string name="activity_main_update_button_label">Aktualisieren</string>
-    <string name="activity_main_last_value_label">Für die Anzeige der letzten empfangenen Werte, bitte Aktualisieren drücken!</string>
     <string name="info_label_per_minute">pro Minute</string>
     <string name="info_label_alarm">Alarm</string>
     <string name="info_label_timediff">Zeitdiff</string>

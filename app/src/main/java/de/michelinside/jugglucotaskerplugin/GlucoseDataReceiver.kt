@@ -101,10 +101,10 @@ class GlucoseDataReceiver : BroadcastReceiver() {
                 ReceiveData.time = extras.getLong(TIME) //time in mmsec
 
                 GlucodataEvent::class.java.requestQuery(context, GlucodataValues() )
+                notifier?.newIntent()
             }
         } catch (exc: Exception) {
             Log.e(LOG_ID, "Exception: " + exc.message.toString() )
-            exc.printStackTrace()
         }
     }
 
@@ -118,6 +118,7 @@ class GlucoseDataReceiver : BroadcastReceiver() {
         private const val ALARM = "glucodata.Minute.Alarm"
         private const val TIME = "glucodata.Minute.Time"
         var dateformat = DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.DEFAULT)
+        var notifier: NewIntentReceiver? = null
     }
 
 
